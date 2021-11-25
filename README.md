@@ -6,7 +6,7 @@ Python module for interfacing with Büchi Temperature Controllers *btc01*/*btc02
 
 ## Example Usage
 
-The `BuchiTemperatureController` class extends the [`serial.Serial`](https://pyserial.readthedocs.io/en/latest/pyserial_api.html#serial.Serial) class. To instantiate, simply pass the port name, e.g. `'COM3'` to the `BuchiTemperatureController` initializer. Port factory settings are assumed (see [About the Device](#about-the-device)).
+The `BuchiTemperatureController` class extends the [`serial.Serial`](https://pyserial.readthedocs.io/en/latest/pyserial_api.html#serial.Serial) class. To instantiate, simply pass the port name, e.g. `'COM3'`, to the `BuchiTemperatureController` initializer. Port factory settings are assumed (see [About the Device](#about-the-device)).
 
 All the available attributes of the Büchi Temperature Controller are implemented as class properties. Each property calls a querying function `query` to get and set the corresponding values via the serial port.
 
