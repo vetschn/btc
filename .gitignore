@@ -1,0 +1,8 @@
+*.csv
+*.pdf
+*.ipynb
+*__pycache__
+dist/
+build/
+*.egg-info
+*.egg
