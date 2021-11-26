@@ -35,6 +35,7 @@ Date:           2021-11-23
 """
 import argparse
 import csv
+import logging
 import time
 import warnings
 from datetime import datetime
@@ -505,17 +506,21 @@ class BuchiTemperatureController(serial.Serial):
         """
         resp = None
         if param is None:
+            logging.debug("Tx: %s", command.encode() + b"\r")
             self.write(command.encode() + b"\r")
             resp = self.read_until(b"\r\n").decode().strip()
+            logging.debug("Rx: %s", resp)
         elif "sp" in command:
+            logging.debug("Tx: %s", command.encode() + b" " + f"{param:.1f}".encode() + b"\r")
             self.write(command.encode() + b" " + f"{param:.1f}".encode() + b"\r")
         else:
+            logging.debug("Tx: %s", command.encode() + b" " + f"{param:d}".encode() + b"\r")
             self.write(command.encode() + b" " + f"{param:d}".encode() + b"\r")
         # The controller does not respond if it receives commands
         # without a little pause in between.
         time.sleep(0.05)
-        # Always check the status to ass
-        self.write(b"status\x0D")
+        # Always check the status to make sure there are no errors.
+        self.write(b"status\r")
         status = self.read_until(b"\r\n")
         if status.startswith(b"-"):
             raise StatusError(status.decode())
@@ -549,9 +554,9 @@ class BuchiTemperatureController(serial.Serial):
             filepath = now.strftime("%Y%m%dT%H%M%S") + "_btc_log" + ".csv"
         with open(filepath, "a+", encoding="utf-8") as f:
             writer = csv.writer(f, delimiter=",", lineterminator="\n")
-            writer.writerow(
-                ["Timestamp", "Power [%]", "T-J [°C]", "T-R [°C]", "T-S [°C]"]
-            )
+            header = ["Timestamp", "Power [%]", "T-J [°C]", "T-R [°C]", "T-S [°C]"]
+            writer.writerow(header)
+            logging.info("%s", ", ".join(header))
             try:
                 while True:
                     t0 = time.time()
@@ -563,6 +568,7 @@ class BuchiTemperatureController(serial.Serial):
                         self.temp_ts,
                     ]
                     writer.writerow(row)
+                    logging.info("%s", ", ".join(row))
                     t1 = time.time()
                     time.sleep(max(timestep - (t1 - t0), 0))
             except KeyboardInterrupt as interrupt:
@@ -591,15 +597,17 @@ def logger():
         "--timestep",
         default=10.0,
         help="The time interval at which to log the controller data.",
+        type=float
     )
     parser.add_argument(
         "-f", "--filepath", default=None, help="Path to a file to append the log to."
     )
     args = parser.parse_args()
     # Connect and start to log.
-    print(f"Attempting to connect to btc on port {args.port}.")
-    btc = BuchiTemperatureController(args.port)
+    logging.basicConfig(level=logging.INFO)
+    logging.info("Attempting to connect to btc on port %s.", args.port)
+    btc = BuchiTemperatureController(args.port, baudrate=args.baudrate)
     if btc.is_open:
-        print("Connection established.")
-    print(f"Starting to log controller data every {args.timestep} s.")
+        logging.info("Connection established.")
+    logging.info("Starting to log controller data every %s s.", args.timestep)
     btc.log_csv(timestep=args.timestep, filepath=args.filepath)
