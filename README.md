@@ -1,6 +1,6 @@
 # Büchi Temperature Controller
 
-Python module for interfacing with Büchi Temperature Controllers *btc01*/*btc02* via the RS232 serial port making use of [pySerial](https://pyserial.readthedocs.io/en/latest/pyserial.html).
+Python package for interfacing with Büchi Temperature Controllers *btc01*/*btc02* via the RS232 serial port making use of [pySerial](https://pyserial.readthedocs.io/en/latest/pyserial.html).
 
 *Written for btc Firmware V7.*
 
@@ -35,6 +35,27 @@ Log the heating power percentage and the temperatures 'T-J', 'T-R', and 'T-S' to
 >>> btc = BuchiTemperatureController('COM3')
 >>> btc.log_csv(timestep=10)
 
+```
+
+After installing the package, you can also use the `btc_logger` console command.
+```
+> cd btc
+> pip install .
+...
+> btc_logger -h
+usage: btc_logger [-h] [-t TIMESTEP] [-f FILEPATH] port
+
+Log temperature data from a Büchi temperature controller.
+
+positional arguments:
+  port                  The serial port connecting to the temperature controller.
+
+options:
+  -h, --help            show this help message and exit
+  -t TIMESTEP, --timestep TIMESTEP
+                        The time interval at which to log the controller data.
+  -f FILEPATH, --filepath FILEPATH
+                        Path to a file to append the log to.
 ```
 
 ## About the Device

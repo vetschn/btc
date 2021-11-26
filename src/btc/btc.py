@@ -19,7 +19,7 @@ These byte sequences consist of a command and an optional parameter.
 Each transfer sequence is terminated with \r.
 
 The controller sends responses to 'in-commands' (without parameters)
-that are terminated with '\r\n'. It does not respond to
+that are terminated with '\r\n'. It does not respond to 'out-commands'.
 
 Example queries:
 Get working temperature 'T2'              b'in_sp_01\r'
@@ -33,6 +33,7 @@ Organisation:   EMPA Dübendorf, Materials for Energy Conversion (501)
 Date:           2021-11-23
 
 """
+import argparse
 import csv
 import time
 import warnings
@@ -570,3 +571,35 @@ class BuchiTemperatureController(serial.Serial):
                 self.reset_output_buffer()
                 self.reset_input_buffer()
                 raise interrupt
+
+
+def logger():
+    """Establishes a connection to a controller and starts to log.
+
+    Entry point for `btc_logger` console script.
+
+    """
+    parser = argparse.ArgumentParser(
+        description="Log temperature data from a Büchi temperature controller."
+    )
+    parser.add_argument(
+        "port",
+        help="The serial port connecting to the temperature controller.",
+    )
+    parser.add_argument(
+        "-t",
+        "--timestep",
+        default=10.0,
+        help="The time interval at which to log the controller data.",
+    )
+    parser.add_argument(
+        "-f", "--filepath", default=None, help="Path to a file to append the log to."
+    )
+    args = parser.parse_args()
+    # Connect and start to log.
+    print(f"Attempting to connect to btc on port {args.port}.")
+    btc = BuchiTemperatureController(args.port)
+    if btc.is_open:
+        print("Connection established.")
+    print(f"Starting to log controller data every {args.timestep} s.")
+    btc.log_csv(timestep=args.timestep, filepath=args.filepath)
