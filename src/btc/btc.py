@@ -606,7 +606,7 @@ def logger():
     # Connect and start to log.
     logging.basicConfig(level=logging.INFO)
     logging.info("Attempting to connect to btc on port %s.", args.port)
-    btc = BuchiTemperatureController(args.port, baudrate=args.baudrate)
+    btc = BuchiTemperatureController(args.port)
     if btc.is_open:
         logging.info("Connection established.")
     logging.info("Starting to log controller data every %s s.", args.timestep)
