@@ -18,7 +18,7 @@ Get the software version number
 >>> from btc import BuchiTemperatureController
 >>> btc = BuchiTemperatureController('COM3')
 >>> btc.version
-
+'BUCHI AG btc01 TEMPERATURE CONTROLLER VERSION 7.0'
 ```
 ### Example 2
 Set the working temperature 'T1' to 12.4 °C
