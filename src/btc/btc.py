@@ -156,9 +156,7 @@ class BuchiTemperatureController(serial.Serial):
         timeout=5,
         **kwargs,
     ) -> None:
-        """Initializes
-
-        """
+        """Initializes a controller via the pyserial package."""
         super().__init__(
             *args,
             baudrate=baudrate,
@@ -511,10 +509,14 @@ class BuchiTemperatureController(serial.Serial):
             resp = self.read_until(b"\r\n").decode().strip()
             logging.debug("Rx: %s", resp)
         elif "sp" in command:
-            logging.debug("Tx: %s", command.encode() + b" " + f"{param:.1f}".encode() + b"\r")
+            logging.debug(
+                "Tx: %s", command.encode() + b" " + f"{param:.1f}".encode() + b"\r"
+            )
             self.write(command.encode() + b" " + f"{param:.1f}".encode() + b"\r")
         else:
-            logging.debug("Tx: %s", command.encode() + b" " + f"{param:d}".encode() + b"\r")
+            logging.debug(
+                "Tx: %s", command.encode() + b" " + f"{param:d}".encode() + b"\r"
+            )
             self.write(command.encode() + b" " + f"{param:d}".encode() + b"\r")
         # The controller does not respond if it receives commands
         # without a little pause in between.
@@ -584,20 +586,21 @@ def logger():
 
     Entry point for `btc_logger` console script.
 
+    This logger can be stopped via keyboard interrupt.
+
     """
     parser = argparse.ArgumentParser(
         description="Log temperature data from a Büchi temperature controller."
     )
     parser.add_argument(
-        "port",
-        help="The serial port connecting to the temperature controller.",
+        "port", help="The serial port connecting to the temperature controller.",
     )
     parser.add_argument(
         "-t",
         "--timestep",
         default=10.0,
         help="The time interval at which to log the controller data.",
-        type=float
+        type=float,
     )
     parser.add_argument(
         "-f", "--filepath", default=None, help="Path to a file to append the log to."
