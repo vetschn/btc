@@ -551,7 +551,6 @@ class BuchiTemperatureController(serial.Serial):
                 "T-S [°C]",
                 "T-J [°C]",
                 "T-R [°C]",
-                "Setpoint [°C]",
             ]
             writer.writerow(header)
             logging.info("%s", ", ".join(header))
@@ -564,7 +563,6 @@ class BuchiTemperatureController(serial.Serial):
                         self.temp_ts,
                         self.temp_tj,
                         self.temp_tr,
-                        self.temp_setpoint,
                     ]
                     writer.writerow(row)
                     logging.info("%s", ", ".join(row))
