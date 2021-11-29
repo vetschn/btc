@@ -78,7 +78,7 @@ class BuchiTemperatureController(serial.Serial):
         High temperature warning limit.
     low_temp_warning_limit ('sp_04')
         Low temperature warning limit.
-    setpoint_temp ('sp_05')
+    temp_setpoint ('sp_05')
         Setpoint temperature of the external programmer. (socket
         -REG+E-PROG)
     max_cooling_power ('hil_00')
@@ -239,7 +239,7 @@ class BuchiTemperatureController(serial.Serial):
         return self.query("out_sp_04", param)
 
     @property
-    def setpoint_temp(self) -> str:
+    def temp_setpoint(self) -> str:
         """Gets the setpoint temperature of the external programmer."""
         return self.query("in_sp_05")
 
@@ -465,17 +465,6 @@ class BuchiTemperatureController(serial.Serial):
         """Sets the min. temperature 'T-J' with controlling to 'T-R'."""
         return self.query("out_par_18", param)
 
-    def _check_status(self) -> None:
-        """Checks for errors in the controller's status.
-
-        The connection remains open even if an error is returned.
-
-        Raises
-        ------
-        StatusError when the 'status' query returns an error code.
-
-        """
-
     def query(self, command: str, param: Any = None) -> Union[str, None]:
         """Sends a query and returns the controller's response.
 
@@ -531,8 +520,8 @@ class BuchiTemperatureController(serial.Serial):
     def log_csv(self, timestep: float = 10.0, filepath: str = None) -> None:
         """Writes temperature controller data to a .csv file.
 
-        The .csv will have columns ('Timestamp', 'Power', 'T-J', 'T-R',
-        and 'T-S').
+        The .csv will have columns 'Timestamp', 'Power', 'T-S', 'T-J',
+        'T-R', and 'Setpoint'.
 
         Parameters
         ----------
@@ -556,7 +545,14 @@ class BuchiTemperatureController(serial.Serial):
             filepath = now.strftime("%Y%m%dT%H%M%S") + "_btc_log" + ".csv"
         with open(filepath, "a+", encoding="utf-8") as f:
             writer = csv.writer(f, delimiter=",", lineterminator="\n")
-            header = ["Timestamp", "Power [%]", "T-J [°C]", "T-R [°C]", "T-S [°C]"]
+            header = [
+                "Timestamp",
+                "Power [%]",
+                "T-S [°C]",
+                "T-J [°C]",
+                "T-R [°C]",
+                "Setpoint [°C]",
+            ]
             writer.writerow(header)
             logging.info("%s", ", ".join(header))
             try:
@@ -565,9 +561,10 @@ class BuchiTemperatureController(serial.Serial):
                     row = [
                         datetime.now().isoformat(),
                         self.heating_power,
+                        self.temp_ts,
                         self.temp_tj,
                         self.temp_tr,
-                        self.temp_ts,
+                        self.temp_setpoint,
                     ]
                     writer.writerow(row)
                     logging.info("%s", ", ".join(row))
@@ -606,7 +603,8 @@ def logger():
         "-f", "--filepath", default=None, help="Path to a file to append the log to."
     )
     args = parser.parse_args()
-    # Connect and start to log.
+    # Connect and start to log. Also set the logging level to INFO to
+    # print to console.
     logging.basicConfig(level=logging.INFO)
     logging.info("Attempting to connect to btc on port %s.", args.port)
     btc = BuchiTemperatureController(args.port)
