@@ -36,7 +36,7 @@ Log the heating power percentage and the temperatures 'T-J', 'T-R', and 'T-S' to
 >>> btc.log_csv(timestep=10)
 
 ```
-
+### Console Command
 After installing the package, you can also use the `btc_logger` console command.
 ```
 > cd btc
@@ -103,11 +103,11 @@ Make sure to consult the operating manual.
 |-------------|-------------|
 | `'version'` | Number of software version (V X.xx). |
 | `'status'`  | Status message, error message. |
-| `'REMOTE'`  | Change the preset value. |
-| `'pv_00'`   | Actual bath temperature. |
-| `'pv_01'`   | Heating power being used (%). |
-| `'pv_02'`   | Temperature value registered by the Pt100 sensor 'T-R. |
-| `'pv_03'`   | Temperature value registered by the safety sensor 'T-S'. |
+| `'REMOTE'`  | Change the preset value. <br> 0 == Set the preset value via the keyboard. <br> 1 == Set the preset value with an external programmer. <br> 2 == Set the preset value via the serial RS232/RS485 interface. |
+| `'pv_00'`   | Temperature value registered by the 'T-J' sensor (measurement/control). |
+| `'pv_01'`   | Heating/cooling power being used (%). |
+| `'pv_02'`   | Temperature value registered by the 'T-R' sensor (measurement/control). |
+| `'pv_03'`   | Temperature value registered by the 'T-S' sensor (safety). |
 | `'sp_00'`   | Working temperature 'T1'. |
 | `'sp_01'`   | Working temperature 'T2'. |
 | `'sp_03'`   | High temperature warning limit. |
